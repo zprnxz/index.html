@@ -108,8 +108,6 @@
             color: #ffd700;
             text-shadow: 0 0 10px rgba(255,215,0,0.5);
             transition: all 0.5s ease;
-            position: relative;
-            overflow: hidden;
         }
 
         .username-display.glitching {
@@ -136,16 +134,9 @@
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-                margin: 1rem;
-            }
-            input {
-                width: 90%;
-            }
-            .username-display {
-                font-size: 1.5rem;
-            }
+            .container { padding: 1rem; margin: 1rem; }
+            input { width: 90%; }
+            .username-display { font-size: 1.5rem; }
         }
     </style>
 </head>
@@ -164,7 +155,7 @@
             <input type="text" id="newUser" placeholder="@newcooluser" value="@grokified">
         </div>
         
-        <button onclick="performMorph()">Connect & Morph Username</button>
+        <button id="morphButton">Connect & Morph Username</button>
         
         <div class="loader" id="loader">
             <div class="spinner"></div>
@@ -176,15 +167,16 @@
         <div class="profile-card" id="profileCard">
             <h3>Updated Profile:</h3>
             <div class="username-display" id="usernameDisplay">@example</div>
-            <p>Bio: Just morphed by Grok! 🚀</p>
+            <p>Bio: Just morphed by Grok!</p>
         </div>
     </div>
 
     <script>
-        function performMorph() {
+        // Fixed version - we get the button properly
+        document.getElementById('morphButton').addEventListener('click', function() {
+            const button = this; // Now this works perfectly!
             const target = document.getElementById('targetUser').value.trim();
             const newUser = document.getElementById('newUser').value.trim();
-            const button = event.target;
             const loader = document.getElementById('loader');
             const status = document.getElementById('status');
             const profile = document.getElementById('profileCard');
@@ -195,7 +187,6 @@
                 return;
             }
             
-            // Disable button & show loader
             button.disabled = true;
             button.textContent = 'Morphing...';
             loader.style.display = 'block';
@@ -203,7 +194,6 @@
             status.classList.remove('show');
             profile.style.display = 'none';
             
-            // Fake "connect" delay with glitch
             setTimeout(() => {
                 display.textContent = target;
                 display.classList.add('glitching');
@@ -211,7 +201,6 @@
                 status.classList.add('show');
             }, 1000);
             
-            // "Success" after delay
             setTimeout(() => {
                 display.classList.remove('glitching');
                 display.textContent = newUser;
@@ -222,7 +211,7 @@
                 button.disabled = false;
                 button.textContent = 'Morph Again';
             }, 3000);
-        }
+        });
     </script>
 </body>
 </html>

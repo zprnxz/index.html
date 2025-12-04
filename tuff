@@ -1,80 +1,228 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Snowy Roblox Profile</title>
-  <style>
-    body { 
-      margin: 0; background: linear-gradient(to bottom, #1e3c72, #2a5298); 
-      font-family: 'Roboto', sans-serif; color: white; overflow: hidden;
-      height: 100vh; display: flex; align-items: center; justify-content: center;
-    }
-    .container {
-      background: rgba(0,0,0,0.6); padding: 40px; border-radius: 20px; text-align: center;
-      box-shadow: 0 0 30px rgba(0,200,255,0.5);
-    }
-    input {
-      padding: 15px; width: 300px; border: none; border-radius: 10px; font-size: 18px; margin: 20px 0;
-    }
-    button {
-      padding: 15px 30px; background: #00c853; color: white; border: none; 
-      border-radius: 10px; font-size: 20px; cursor: pointer; transition: 0.3s;
-    }
-    button:hover { background: #00e676; transform: scale(1.05); }
-    canvas { position: absolute; top: 0; left: 0; z-index: -1; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Username Morpher</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #ff0050 0%, #ff9a9e 100%);
+            font-family: 'Arial', sans-serif;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 500px;
+            padding: 2rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        input {
+            width: 80%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            text-align: center;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+        }
+
+        button {
+            background: #ff0050;
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 0.5rem;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(255,0,80,0.4);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loader {
+            display: none;
+            margin: 1rem 0;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .profile-card {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            display: none;
+        }
+
+        .username-display {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255,215,0,0.5);
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .username-display.glitching {
+            animation: glitch 0.3s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+
+        .status-msg {
+            margin: 1rem 0;
+            font-size: 1.1rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .status-msg.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+                margin: 1rem;
+            }
+            input {
+                width: 90%;
+            }
+            .username-display {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>TikTok Username Morpher</h1>
+        <p>Enter details for the fake swap (demo only—no real changes!)</p>
+        
+        <div class="form-group">
+            <label for="targetUser">Target TikTok Username:</label>
+            <input type="text" id="targetUser" placeholder="@cooluser" value="@example">
+        </div>
+        
+        <div class="form-group">
+            <label for="newUser">Desired New Username:</label>
+            <input type="text" id="newUser" placeholder="@newcooluser" value="@grokified">
+        </div>
+        
+        <button onclick="performMorph()">Connect & Morph Username</button>
+        
+        <div class="loader" id="loader">
+            <div class="spinner"></div>
+            <p>Connecting to TikTok servers... (simulated)</p>
+        </div>
+        
+        <div class="status-msg" id="status"></div>
+        
+        <div class="profile-card" id="profileCard">
+            <h3>Updated Profile:</h3>
+            <div class="username-display" id="usernameDisplay">@example</div>
+            <p>Bio: Just morphed by Grok! 🚀</p>
+        </div>
+    </div>
 
-<canvas id="snow"></canvas>
-
-<div class="container">
-  <h1>❄️ Roblox Profile Hub ❄️</h1>
-  <input type="text" id="username" placeholder="Enter your Roblox username">
-  <br>
-  <button onclick="showProfile()">Show My Profile</button>
-</div>
-
-<script>
-  // Snow effect
-  const canvas = document.getElementById('snow');
-  const ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-
-  const snowflakes = [];
-  for(let i = 0; i < 150; i++) {
-    snowflakes.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      r: Math.random() * 4 + 1,
-      speed: Math.random() * 1 + 0.5
-    });
-  }
-
-  function drawSnow() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-    ctx.beginPath();
-    for(let s of snowflakes) {
-      ctx.moveTo(s.x, s.y);
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      s.y += s.speed;
-      if(s.y > canvas.height) s.y = 0;
-      s.x += Math.random() * 2 - 1;
-    }
-    ctx.fill();
-    requestAnimationFrame(drawSnow);
-  }
-  drawSnow();
-
-  function showProfile() {
-    const user = document.getElementById('username').value.trim();
-    if(user) {
-      window.open(`https://www.roblox.com/users/profile?username=${user}`, '_blank');
-    } else {
-      alert("Please enter a username!");
-    }
-  }
-</script>
+    <script>
+        function performMorph() {
+            const target = document.getElementById('targetUser').value.trim();
+            const newUser = document.getElementById('newUser').value.trim();
+            const button = event.target;
+            const loader = document.getElementById('loader');
+            const status = document.getElementById('status');
+            const profile = document.getElementById('profileCard');
+            const display = document.getElementById('usernameDisplay');
+            
+            if (!target || !newUser) {
+                alert('Fill in both usernames!');
+                return;
+            }
+            
+            // Disable button & show loader
+            button.disabled = true;
+            button.textContent = 'Morphing...';
+            loader.style.display = 'block';
+            status.textContent = '';
+            status.classList.remove('show');
+            profile.style.display = 'none';
+            
+            // Fake "connect" delay with glitch
+            setTimeout(() => {
+                display.textContent = target;
+                display.classList.add('glitching');
+                status.textContent = 'Glitching connection...';
+                status.classList.add('show');
+            }, 1000);
+            
+            // "Success" after delay
+            setTimeout(() => {
+                display.classList.remove('glitching');
+                display.textContent = newUser;
+                status.textContent = 'Morph complete! (Fake update only)';
+                status.classList.add('show');
+                profile.style.display = 'block';
+                loader.style.display = 'none';
+                button.disabled = false;
+                button.textContent = 'Morph Again';
+            }, 3000);
+        }
+    </script>
 </body>
 </html>
